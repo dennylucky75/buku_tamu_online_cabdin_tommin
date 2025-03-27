@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buku Tamu Cabang Dinas Tomohon Minahasa</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-image: url('assets/img/gub_wagub.jpg'); /* Background image from assets folder */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            color: #333;
+        }
+        header {
+            background-color: rgba(0, 123, 255, 0.8);
+            color: white;
+            text-align: center;
+            padding: 20px 0;
+            position: relative;
+        }
+        header img {
+            max-height: 80px;
+            margin-bottom: 10px;
+        }
+        h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        form {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            box-sizing: border-box;
+        }
+        button {
+            margin-top: 15px;
+            padding: 10px 15px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        .stats {
+            margin-top: 20px;
+            text-align: center;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 15px;
+        }
+        .developer-info {
+            font-size: 10px;
+            text-align: center;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <img src="assets/img/logo.png" alt="Logo Aplikasi Buku Tamu">
+        <h1>Buku Tamu Cabang Dinas Tomohon Minahasa</h1>
+    </header>
+    <form id="guestForm">
+        <label for="nama">Nama:</label>
+        <input type="text" id="nama" name="nama" required>
+        <label for="instansi">Asal Instansi:</label>
+        <input type="text" id="instansi" name="instansi" required>
+        <label for="jabatan">Jabatan:</label>
+        <input type="text" id="jabatan" name="jabatan" required>
+        <label for="nomor_hp">Nomor Handphone (WA):</label>
+        <input type="text" id="nomor_hp" name="nomor_hp" required>
+        <label for="tujuan">Maksud dan Tujuan:</label>
+        <textarea id="tujuan" name="tujuan" rows="4" required></textarea>
+        <label for="pimpinan">Pimpinan/Bagian Yang Akan Dihubungi:</label>
+        <select id="pimpinan" name="pimpinan" required>
+            <option value="">-- Pilih --</option>
+            <option value="Kepala Cabang Dinas">Kepala Cabang Dinas</option>
+            <option value="Kepala Sub Bagian TU">Kepala Sub Bagian TU</option>
+            <option value="Kepala Seksi SMK/GTK">Kepala Seksi SMK/GTK</option>
+            <option value="Kepala Seksi SMA/PKLK">Kepala Seksi SMA/PKLK</option>
+            <option value="Pejabat Fungsional Pengembang Teknologi Pembelajaran Ahli Muda">
+                Pejabat Fungsional Pengembang Teknologi Pembelajaran Ahli Muda
+            </option>
+            <option value="Perbendaharaan">Perbendaharaan</option>
+            <option value="Pengelola Sertifikasi">Pengelola Sertifikasi</option>
+            <option value="Pengelola BOS">Pengelola BOS</option>
+            <option value="Bagian TUP">Bagian TUP</option>
+            <option value="Bagian TUP">Pegawai Lainnya</option>
+        </select>
+        <label for="foto">Wajib Upload Foto Timestamp:</label>
+        <input type="file" id="foto" name="foto" accept="image/*" required>
+        <button type="submit">Simpan</button>
+        <div class="developer-info">Software Developer: Denny L. J. Oroh, S.Pd</div>
+    </form>
+    <div id="antrianInfo"></div>
+    <table id="rekapTable">
+        <thead>
+            <tr>
+                <th>Nomor Antrian</th>
+                <th>Nama</th>
+                <th>Asal Instansi</th>
+                <th>Jabatan</th>
+                <th>Nomor HP</th>
+                <th>Maksud dan Tujuan</th>
+                <th>Pimpinan/Bagian</th>
+                <th>Foto</th>
+                <th>Tanggal Kunjungan</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+    <button onclick="exportToExcel()">Export ke Excel</button>
+    <div class="stats">
+        <h2>Statistik Kunjungan</h2>
+        <p>Hari Ini: <span id="hariIni">0</span></p>
+        <p>Kemarin: <span id="kemarin">0</span></p>
+        <p>Mingguan: <span id="mingguan">0</span></p>
+        <p>Bulanan: <span id="bulanan">0</span></p>
+    </div>
+    <script>
+        const dataKey = "guestData";
+        let data = JSON.parse(localStorage.getItem(dataKey)) || [];
+        const tbody = document.querySelector("#rekapTable tbody");
+        const stats = {
+            hariIni: 0,
+            kemarin: 0,
+            mingguan: 0,
+            bulanan: 0
+        };
+        let lastDate = null; // Untuk melacak tanggal terakhir
+        let dailyCounter = 1; // Nomor antrian harian
+
+        // Initialize data and UI on page load
+        window.onload = function() {
+            updateTable();
+            updateStats();
+        };
+
+        document.getElementById("guestForm").addEventListener("submit", function (e) {
+            e.preventDefault();
+            const nama = document.getElementById("nama").value;
+            const instansi = document.getElementById("instansi").value;
+            const jabatan = document.getElementById("jabatan").value;
+            const nomor_hp = document.getElementById("nomor_hp").value;
+            const tujuan = document.getElementById("tujuan").value;
+            const pimpinan = document.getElementById("pimpinan").value;
+            const foto = document.getElementById("foto").files[0];
+            const tanggal = new Date().toLocaleString();
+            const currentDate = new Date().toLocaleDateString(); // Tanggal saat ini
+
+            if (!foto) {
+                alert("Foto wajib diupload!");
+                return;
+            }
+
+            // Reset nomor antrian jika tanggal berubah
+            if (lastDate !== currentDate) {
+                dailyCounter = 1;
+                lastDate = currentDate;
+            } else {
+                dailyCounter++;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function (event) {
+                const fotoUrl = event.target.result;
+                const entry = {
+                    nama,
+                    instansi,
+                    jabatan,
+                    nomor_hp,
+                    tujuan,
+                    pimpinan,
+                    foto: fotoUrl,
+                    tanggal
+                };
+                data.push(entry);
+                localStorage.setItem(dataKey, JSON.stringify(data)); // Save to localStorage
+                updateTable();
+                updateStats();
+                document.getElementById("guestForm").reset();
+            };
+            reader.readAsDataURL(foto);
+        });
+
+        function updateTable() {
+            tbody.innerHTML = "";
+            data.forEach((entry, index) => {
+                const row = `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${entry.nama}</td>
+                        <td>${entry.instansi}</td>
+                        <td>${entry.jabatan}</td>
+                        <td>${entry.nomor_hp}</td>
+                        <td>${entry.tujuan}</td>
+                        <td>${entry.pimpinan}</td>
+                        <td><img src="${entry.foto}" alt="Foto" style="width: 50px;"></td>
+                        <td>${entry.tanggal}</td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+        }
+
+        function updateStats() {
+            const now = new Date();
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const yesterday = new Date(today);
+            yesterday.setDate(today.getDate() - 1);
+            const startOfWeek = new Date(today);
+            startOfWeek.setDate(today.getDate() - today.getDay());
+            const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+            stats.hariIni = data.filter(entry => new Date(entry.tanggal) >= today).length;
+            stats.kemarin = data.filter(entry => new Date(entry.tanggal) >= yesterday && new Date(entry.tanggal) < today).length;
+            stats.mingguan = data.filter(entry => new Date(entry.tanggal) >= startOfWeek).length;
+            stats.bulanan = data.filter(entry => new Date(entry.tanggal) >= startOfMonth).length;
+
+            document.getElementById("hariIni").textContent = stats.hariIni;
+            document.getElementById("kemarin").textContent = stats.kemarin;
+            document.getElementById("mingguan").textContent = stats.mingguan;
+            document.getElementById("bulanan").textContent = stats.bulanan;
+        }
+
+        function exportToExcel() {
+            const worksheetData = [
+                ["No", "Nama", "Asal Instansi", "Jabatan", "Nomor HP", "Maksud dan Tujuan", "Pimpinan/Bagian", "Tanggal Kunjungan"]
+            ];
+            data.forEach((entry, index) => {
+                worksheetData.push([
+                    index + 1,
+                    entry.nama,
+                    entry.instansi,
+                    entry.jabatan,
+                    entry.nomor_hp,
+                    entry.tujuan,
+                    entry.pimpinan,
+                    entry.tanggal
+                ]);
+            });
+            const ws = XLSX.utils.aoa_to_sheet(worksheetData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Rekap Kunjungan");
+            XLSX.writeFile(wb, "Rekap_Kunjungan.xlsx");
+        }
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</body>
+</html>
